@@ -1,8 +1,6 @@
 package tasks.task4;
 
-import tasks.task4.exceptions.InsufficientFundsException;
-import tasks.task4.exceptions.InvalidTransactionAmountException;
-import tasks.task4.exceptions.MaxBalanceExceededException;
+import tasks.task4.exceptions.InvalidAmountException;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -33,7 +31,7 @@ public class Bank {
     }
 
     public void withdraw(BankAcount bankAcount, double amount){
-        if (amount <= 0) throw new InvalidTransactionAmountException();
+        if (amount <= 0) throw new InvalidAmountException();
         executor.execute(() -> {
             synchronized (bankAcount) {
                 bankAcount.withdraw(amount);
@@ -42,7 +40,7 @@ public class Bank {
     }
 
     public void deposit(BankAcount bankAcount, double amount) {
-        if (amount <= 0) throw new InvalidTransactionAmountException();
+        if (amount <= 0) throw new InvalidAmountException();
         executor.execute(() -> {
             synchronized (bankAcount) {
                 bankAcount.deposit(amount);
@@ -50,8 +48,8 @@ public class Bank {
         });
     }
 
-    public void transfer(BankAcount from, BankAcount to, double amount) throws InvalidTransactionAmountException {
-        if (amount <= 0) throw new InvalidTransactionAmountException();
+    public void transfer(BankAcount from, BankAcount to, double amount) throws InvalidAmountException {
+        if (amount <= 0) throw new InvalidAmountException();
         executor.execute(() -> {
             BankAcount first = from;
             BankAcount second = to;

@@ -1,7 +1,7 @@
 package tasks.task4.exceptions;
 
-public class InvalidTransactionAmountException extends RuntimeException{
-    public InvalidTransactionAmountException(){
+public class InvalidAmountException extends RuntimeException{
+    public InvalidAmountException(){
         super("Сумма перевода должна быть больше 0");
     }
 }
