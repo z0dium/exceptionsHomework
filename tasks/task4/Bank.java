@@ -101,4 +101,8 @@ public class Bank {
     private void checkAmount(double amount){
         if (amount <= 0) throw new InvalidAmountException();
     }
+
+    public void stopProcessing(){
+        executor.shutdown();
+    }
 }
