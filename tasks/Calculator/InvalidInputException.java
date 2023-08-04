@@ -1,2 +1,5 @@
-package tasks.Calculator;public class InvalidInputException {
+package tasks.Calculator;
+
+public class InvalidInputException extends RuntimeException{
+    public InvalidInputException(String message){super(message);}
 }
