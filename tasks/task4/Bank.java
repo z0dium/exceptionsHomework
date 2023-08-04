@@ -1,6 +1,8 @@
 package tasks.task4;
 
+import tasks.task4.exceptions.InsufficientFundsException;
 import tasks.task4.exceptions.InvalidAmountException;
+import tasks.task4.exceptions.MaxBalanceExceededException;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -31,25 +33,46 @@ public class Bank {
     }
 
     public void withdraw(BankAcount bankAcount, double amount){
-        if (amount <= 0) throw new InvalidAmountException();
+        try {
+            checkAmount(amount);
+        } catch (InvalidAmountException ex){
+            //Сообщить о некорректности суммы операции
+        }
+
         executor.execute(() -> {
             synchronized (bankAcount) {
-                bankAcount.withdraw(amount);
+                try{
+                    bankAcount.withdraw(amount);
+                } catch (InsufficientFundsException ex){
+                    // Сообщить о невозможности вывода средств в связи с недостатком средст на счете.
+                }
             }
         });
     }
 
     public void deposit(BankAcount bankAcount, double amount) {
-        if (amount <= 0) throw new InvalidAmountException();
+        try {
+            checkAmount(amount);
+        } catch (InvalidAmountException ex){
+            //Сообщить о некорректности суммы операции
+        }
         executor.execute(() -> {
             synchronized (bankAcount) {
-                bankAcount.deposit(amount);
+                try {
+                    bankAcount.deposit(amount);
+                }catch (MaxBalanceExceededException ex){
+                    //Сообщить о невозможности провести операцию в связи с превышением максимальной суммы счета.
+                }
             }
         });
     }
 
     public void transfer(BankAcount from, BankAcount to, double amount) throws InvalidAmountException {
-        if (amount <= 0) throw new InvalidAmountException();
+        try {
+            checkAmount(amount);
+        } catch (InvalidAmountException ex){
+            //Сообщить о некорректности суммы операции
+        }
         executor.execute(() -> {
             BankAcount first = from;
             BankAcount second = to;
@@ -59,11 +82,23 @@ public class Bank {
             }
             synchronized (first) {
                 synchronized (second) {
-                    if (from.withdraw(amount) == true) {
-                        if (to.deposit(amount) == false) from.deposit(amount);
+                    try{
+                        from.withdraw(amount);
+                        try{
+                            to.deposit(amount);
+                        } catch (MaxBalanceExceededException ex){
+                            //Сообщить о невозможности провести операцию в связи с превышением максимальной суммы счета.
+                            from.deposit(amount);
+                        }
+                    } catch (InsufficientFundsException ex){
+                        // Сообщить о невозможности вывода средств в связи с недостатком средст на счете.
                     }
                 }
             }
         });
+    }
+
+    private void checkAmount(double amount){
+        if (amount <= 0) throw new InvalidAmountException();
     }
 }
